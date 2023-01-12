@@ -11,10 +11,10 @@ data "google_client_config" "default" {}
 resource "google_container_cluster" "gke-cluster" {
   count = var.gke_enabled ? 1 : 0
 
-  name                   = "${var.yourname}-${var.env}-gke"
-  location               = "${var.region_name}-b" # single zone cluster
-  network                = google_compute_network.vpc.name
-  subnetwork             = google_compute_subnetwork.public_subnet.name
+  name       = "${var.yourname}-${var.env}-gke"
+  location   = "${var.region_name}-b" # single zone cluster
+  network    = google_compute_network.vpc.name
+  subnetwork = google_compute_subnetwork.public_subnet.name
 
   # skip default node pool so keep it at minimum and remove (per docs)
   remove_default_node_pool = true
@@ -24,7 +24,7 @@ resource "google_container_cluster" "gke-cluster" {
     daily_maintenance_window {
       start_time = "01:00"
     }
-  }  
+  }
 }
 
 
@@ -32,12 +32,13 @@ resource "google_container_node_pool" "np" {
   count = var.gke_enabled ? 1 : 0
 
   name       = "redis-node-pool"
+  location   = "${var.region_name}-b" # single zone cluster
   cluster    = google_container_cluster.gke-cluster.0.name
   node_count = var.gke_clustersize
   node_config {
     machine_type = var.gke_machine_type
     labels = {
-      owner = var.yourname
+      owner         = var.yourname
       skip_deletion = "yes"
     }
   }
